@@ -1,8 +1,10 @@
 using System.IO.Compression;
 using AutoMapper;
+using Azure;
 using BibliotecaApi.Datos;
 using BibliotecaApi.DTOs;
 using BibliotecaApi.Entidades;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,6 +45,7 @@ public class AutoresController : ControllerBase
     {
          var autor = await dbContext.Autores
          .Include(x => x.Libros)
+            .ThenInclude(x => x.Libro)
          .FirstOrDefaultAsync(x => x.Id == id);
 
         if(autor is null)
@@ -81,6 +84,37 @@ public class AutoresController : ControllerBase
         dbContext.Update(autor);
         await dbContext.SaveChangesAsync();
         //Devuelve un 200 OK indicando que la operación fue exitosa.
+        return NoContent();
+    }
+
+    //Accion Patch, actualizacion de datos especificos
+    [HttpPatch("{id:int}")]
+    public async Task<ActionResult> Patch(int id, JsonPatchDocument<AutorPatchDTO> patchDocument)
+    {
+        if(patchDocument is null)
+        {
+            return BadRequest();
+        }
+
+        var autorDB = await dbContext.Autores.FirstOrDefaultAsync(x => x.Id == id);
+        if(autorDB is null)
+        {
+            return NotFound();
+        }
+
+        var autorPatchDTO = mapper1.Map<AutorPatchDTO>(autorDB);
+        patchDocument.ApplyTo(autorPatchDTO, ModelState);
+
+        var esValido = TryValidateModel(autorPatchDTO);
+
+        if(!esValido)
+        {
+            return ValidationProblem();
+        }
+
+        mapper1.Map(autorPatchDTO, autorDB);
+        await dbContext.SaveChangesAsync();
+
         return NoContent();
     }
 

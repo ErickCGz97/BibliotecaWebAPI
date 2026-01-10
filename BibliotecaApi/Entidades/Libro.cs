@@ -10,10 +10,10 @@ public class Libro
     [StringLength(250, ErrorMessage ="EL campo {0} deve tener {1} caracteres o menos")]
     public required string Titulo {get;set;}
 
-    public int AutorId {get;set;}
-
     /*Propiedad navigacional o Propiedad de navegacion
         Permite traer data de una entidad relacionada
     */
-    public Autor? Autor {get;set;}
+    public List<AutorLibro> Autores {get;set;} = [];
+
+    public List<Comentario> Comentarios { get; set; }   = [];
 }

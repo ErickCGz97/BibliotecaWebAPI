@@ -17,15 +17,25 @@ public class AutoMapperProfiles : Profile
             config => config.MapFrom(autor => MapearNombreApellidoAutor(autor)));
 
         CreateMap<AutorCreacionDTO , Autor>();
+        CreateMap<Autor, AutorPatchDTO>().ReverseMap();
 
-        //Mapper de Libros
-        CreateMap<Libro,LibroConAutorDTO>()
-        .ForMember(dto => dto.AutorNombre, 
-            config => config.MapFrom(ent => MapearNombreApellidoAutor(ent.Autor!)));
-
+        CreateMap<AutorLibro, LibroDTO>()
+            .ForMember(dto => dto.Id, config => config.MapFrom(ent => ent.LibroId))
+            .ForMember(dto => dto.Titulo, config => config.MapFrom(ent => ent.Libro!.Titulo));
 
         CreateMap<Libro,LibroDTO>();
-        CreateMap<LibroCreacionDTO, Libro>();
+        CreateMap<LibroCreacionDTO, Libro>()
+            .ForMember(ent => ent.Autores, config => config.MapFrom(dto => dto.AutoresIds.Select(id => new AutorLibro {AutorId = id})));
+
+        CreateMap<Libro,LibroConAutoresDTO>();
+
+        CreateMap<AutorLibro,AutorDTO>()
+            .ForMember(dto => dto.Id, config => config.MapFrom(ent => ent.AutorId))
+            .ForMember(dto => dto.NombreCompleto, config => config.MapFrom(ent => MapearNombreApellidoAutor(ent.Autor!)));
+
+        CreateMap<ComentarioCreacionDTO, Comentario>();
+        CreateMap<Comentario, ComentarioDTO>();  
+        CreateMap<ComentarioPatchDTO, Comentario>().ReverseMap();
     }
 
     //private string MapearNombreApellidoAutor(Autor autor) => $"{autor.Nombres} {autor.Apellidos}";

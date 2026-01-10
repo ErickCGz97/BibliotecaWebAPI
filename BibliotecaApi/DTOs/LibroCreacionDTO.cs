@@ -8,5 +8,5 @@ public class LibroCreacionDTO
     [StringLength(250, ErrorMessage ="EL campo {0} deve tener {1} caracteres o menos")]
     public required string Titulo {get;set;}
 
-    public int AutorId {get;set;}
+    public List<int> AutoresIds {get;set;} = [];
 }

@@ -4,6 +4,7 @@ using BibliotecaApi.Datos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BibliotecaApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260105225826_TablaComentarios")]
+    partial class TablaComentarios
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,24 +52,6 @@ namespace BibliotecaApi.Migrations
                     b.ToTable("Autores");
                 });
 
-            modelBuilder.Entity("BibliotecaApi.Entidades.AutorLibro", b =>
-                {
-                    b.Property<int>("AutorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LibroId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Orden")
-                        .HasColumnType("int");
-
-                    b.HasKey("AutorId", "LibroId");
-
-                    b.HasIndex("LibroId");
-
-                    b.ToTable("AutoresLibros");
-                });
-
             modelBuilder.Entity("BibliotecaApi.Entidades.Comentario", b =>
                 {
                     b.Property<Guid>("Id")
@@ -98,6 +83,9 @@ namespace BibliotecaApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AutorId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -105,26 +93,9 @@ namespace BibliotecaApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AutorId");
+
                     b.ToTable("Libros");
-                });
-
-            modelBuilder.Entity("BibliotecaApi.Entidades.AutorLibro", b =>
-                {
-                    b.HasOne("BibliotecaApi.Entidades.Autor", "Autor")
-                        .WithMany("Libros")
-                        .HasForeignKey("AutorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BibliotecaApi.Entidades.Libro", "Libro")
-                        .WithMany("Autores")
-                        .HasForeignKey("LibroId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Autor");
-
-                    b.Navigation("Libro");
                 });
 
             modelBuilder.Entity("BibliotecaApi.Entidades.Comentario", b =>
@@ -138,6 +109,17 @@ namespace BibliotecaApi.Migrations
                     b.Navigation("Libro");
                 });
 
+            modelBuilder.Entity("BibliotecaApi.Entidades.Libro", b =>
+                {
+                    b.HasOne("BibliotecaApi.Entidades.Autor", "Autor")
+                        .WithMany("Libros")
+                        .HasForeignKey("AutorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Autor");
+                });
+
             modelBuilder.Entity("BibliotecaApi.Entidades.Autor", b =>
                 {
                     b.Navigation("Libros");
@@ -145,8 +127,6 @@ namespace BibliotecaApi.Migrations
 
             modelBuilder.Entity("BibliotecaApi.Entidades.Libro", b =>
                 {
-                    b.Navigation("Autores");
-
                     b.Navigation("Comentarios");
                 });
 #pragma warning restore 612, 618
