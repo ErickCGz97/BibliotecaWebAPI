@@ -33,6 +33,11 @@ public class AutoMapperProfiles : Profile
             .ForMember(dto => dto.Id, config => config.MapFrom(ent => ent.AutorId))
             .ForMember(dto => dto.NombreCompleto, config => config.MapFrom(ent => MapearNombreApellidoAutor(ent.Autor!)));
 
+        //Mapeo para la creacion de Libros en el Post de crecaion de Autores
+        CreateMap<LibroCreacionDTO, AutorLibro>()
+            .ForMember(ent => ent.Libro,
+                config => config.MapFrom(dto => new Libro {Titulo = dto.Titulo}));
+
         CreateMap<ComentarioCreacionDTO, Comentario>();
         CreateMap<Comentario, ComentarioDTO>();  
         CreateMap<ComentarioPatchDTO, Comentario>().ReverseMap();
